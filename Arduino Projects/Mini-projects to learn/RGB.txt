@@ -1,0 +1,73 @@
+int redPin = 8;
+int greenPin = 9;
+int bluePin = 10;
+String myColour;
+String msg = "What colour do you want?(RGB)";
+void setup() {
+  Serial.begin(9600);
+  pinMode(redPin,OUTPUT);
+  pinMode(greenPin,OUTPUT);
+  pinMode(bluePin,OUTPUT);
+}
+
+void loop() {
+  Serial.println(msg);
+  while(Serial.available()==0)
+  {
+
+  }
+  myColour = Serial.readString();
+  if(myColour=="R")
+  {
+    digitalWrite(redPin,HIGH);
+    digitalWrite(greenPin,LOW);
+    digitalWrite(bluePin,LOW);
+  }
+  if(myColour=="G")
+  {
+    digitalWrite(redPin,LOW);
+    digitalWrite(greenPin,HIGH);
+    digitalWrite(bluePin,LOW);
+  }
+  if(myColour=="B")
+  {
+    digitalWrite(redPin,LOW);
+    digitalWrite(greenPin,LOW);
+    digitalWrite(bluePin,HIGH);
+  }
+  if(myColour=="off")
+  {
+    digitalWrite(redPin,LOW);
+    digitalWrite(greenPin,LOW);
+    digitalWrite(bluePin,LOW);
+  }
+  if(myColour=="aqua")
+  {
+    digitalWrite(redPin,LOW);
+    analogWrite(greenPin,255);
+    analogWrite(bluePin,125);
+  
+  }
+  if(myColour=="yellow")
+  {
+    analogWrite(redPin,255);
+    analogWrite(greenPin,150);
+    analogWrite(bluePin,0);
+  
+  }
+  if(myColour=="cyan")
+  {
+    analogWrite(redPin,0);
+    analogWrite(greenPin,255);
+    analogWrite(bluePin,255);
+  
+  }
+  if(myColour=="magenta")
+  {
+    analogWrite(redPin,255);
+    analogWrite(greenPin,0);
+    analogWrite(bluePin,100);
+  
+  }
+}
+

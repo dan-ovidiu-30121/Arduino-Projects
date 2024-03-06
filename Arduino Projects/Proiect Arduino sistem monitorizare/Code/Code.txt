@@ -1,0 +1,138 @@
+#include <Stepper.h>
+#include <Servo.h>
+
+int stepsPerRevolution = 2048;
+Stepper myStepper(stepsPerRevolution, 8, 10, 9, 11);
+int motorDirection = 1;
+
+const int trigPin = 3;
+const int echoPin = 4;
+int buzzPin = 13;
+long duration;
+int distance;
+Servo myServo;
+int servoPin = 5;
+
+int xPin = A1;
+int switchPin = 7;
+int wVx, sVal, xVal;
+
+int buttonOld = 1;
+int state = 0;
+void setup() {
+  Serial.begin(9600);
+
+  pinMode(trigPin, OUTPUT);
+  pinMode(echoPin, INPUT);
+  pinMode(buzzPin, OUTPUT);
+  myServo.attach(servoPin);
+
+  pinMode(xPin, INPUT);
+  pinMode(switchPin, INPUT);
+  digitalWrite(switchPin, HIGH);
+}
+
+void loop() {
+  sVal = digitalRead(switchPin);
+  if (buttonOld == 1 && sVal == 0) {
+    state = 0;
+    delay(500);
+  }
+  if(state == 0){
+    executeAuto();
+  }
+  else
+    executeManual();
+  buttonOld = sVal;
+}
+
+void moveStepper(int speed) {
+  myStepper.setSpeed(speed);
+  myStepper.step(motorDirection * 10);
+}
+
+int calculateDistance() {
+  digitalWrite(trigPin, LOW);
+  delayMicroseconds(2);
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPin, LOW);
+  duration = pulseIn(echoPin, HIGH);
+  distance = duration * 0.034 / 2;
+  return distance;
+}
+void executeAuto() {
+  for (int i = 15; i <= 165; i++) {
+    sVal = digitalRead(switchPin);
+  if (buttonOld == 1 && sVal == 0) {
+    state = 1 ;
+    executeManual();
+    return;
+  }
+    myStepper.step(motorDirection * 1);
+    myServo.write(i);
+    delay(30);
+    distance = calculateDistance();
+
+    
+    if (distance <= 10) {
+      moveStepper(map(distance, 5, 200, 5, 25));  
+      digitalWrite(buzzPin, HIGH);
+      delay(50);
+      digitalWrite(buzzPin, LOW);
+    }
+
+    Serial.print(i);
+    Serial.print(",");
+    Serial.print(distance);
+    Serial.print(".");
+  }
+
+  delay(500);
+
+  for (int i = 165; i > 15; i--) {
+    sVal = digitalRead(switchPin);
+  if (buttonOld == 1 && sVal == 0) {
+    state=1;
+    executeManual();
+    return;
+  }
+    myStepper.step(motorDirection * 1);
+    myServo.write(i);
+    delay(30);
+    distance = calculateDistance();
+
+    
+    if (distance <= 10) {
+      moveStepper(map(distance, 5, 200, 5, 25));  
+      digitalWrite(buzzPin, HIGH);
+      delay(50);
+      digitalWrite(buzzPin, LOW);
+    }
+
+    Serial.print(i);
+    Serial.print(",");
+    Serial.print(distance);
+    Serial.print(".");
+  }
+
+  delay(500);
+}
+void executeManual() {
+  xVal = analogRead(xPin);
+  wVx = 180. / 1023. * xVal;
+  myServo.write(wVx);
+
+  distance = calculateDistance();
+  if (distance <= 10) {
+    moveStepper(map(distance, 5, 200, 5, 25));  
+    digitalWrite(buzzPin, HIGH);
+    delay(50);
+    digitalWrite(buzzPin, LOW);
+  }
+
+  Serial.print(wVx);
+  Serial.print(",");
+  Serial.print(distance);
+  Serial.print(".");
+}

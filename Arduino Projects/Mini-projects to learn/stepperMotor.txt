@@ -1,0 +1,33 @@
+#include <Stepper.h>
+int stepsPerRevolution = 2048;
+Stepper myStepper(stepsPerRevolution,8,10,9,11);
+int motSpeed = 10;
+int buttonPin = 4;
+int dt = 500;
+int buttonNew, buttonOld = 1;
+int motorDirection = 1;
+void setup() {
+  Serial.begin(9600);
+  myStepper.setSpeed(motSpeed);
+  pinMode(buttonPin,INPUT);
+  digitalWrite(buttonPin,HIGH);
+}
+
+void loop() {
+  buttonNew = digitalRead(buttonPin);
+  Serial.println(buttonNew);
+  if(buttonOld == 1 && buttonNew == 0)
+  {
+    if(motorDirection == 1)
+    {
+       myStepper.step(stepsPerRevolution);
+       motorDirection = -1;
+    }
+    else
+    {
+      myStepper.step(-stepsPerRevolution);
+      motorDirection = 1;
+    }
+  }
+  buttonOld = buttonNew;
+}

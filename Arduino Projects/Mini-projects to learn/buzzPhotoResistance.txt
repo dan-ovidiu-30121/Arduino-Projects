@@ -1,0 +1,19 @@
+int buzzPin = 13;
+int lightPin = A0;
+int lightVal;
+int toneVal;
+void setup() {
+  pinMode(buzzPin,OUTPUT);
+  pinMode(lightPin,INPUT);
+  Serial.begin(9600);
+}
+
+void loop() {
+  lightVal = analogRead(lightPin);
+  toneVal = (9./550.)*lightVal-(9.*200./500.)+1;
+  digitalWrite(buzzPin,HIGH);
+  delayMicroseconds(toneVal);
+  digitalWrite(buzzPin,LOW);
+  delayMicroseconds(toneVal);
+
+}
